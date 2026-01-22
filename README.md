@@ -6,26 +6,24 @@ Welcome to the YunoJuno candidate test.
 
 First of all, thank you for applying and we appreciate you taking
 the time to do this test. It's not designed to be a long challenge
-so please don't spend more than three hours on it max.
+so please don't spend more than three hours on it, maximum.
 
 You'll have the best head start if you read this file in its entirety,
 but please do get in touch if you have outstanding queries that are
-not answered - this test is meant to resemble everyday development
+not answered. This test is meant to resemble everyday development
 as much as it can given the constraints.
 
 ### 👋 Introduction
 
 This repo is a point-in-time clone of one of our open-source projects
 that is an active dependency of our platform. Your task will be to
-setup the project and extend it with a feature in a specific way.
+set up the project and extend it with a small feature.
 
 This particular Django library allows us to handle guest visitors (and
-all the authorisation overhead that comes with that) in a straight-
-forward way with minimal changes required to underlying views.
-
-It allows us to create links that visitors can use to access a specific
-view for a specific time period, without them having to login via the
-normal authentication system.
+all the authorisation overhead that comes with that) in a straightforward way, with
+minimal changes required to underlying views. It allows us to create links that visitors
+can use to access a specific view for a given time period, without them having to log in
+via the normal authentication system.
 
 You can read the full README in the section below, and that will give
 you a much better background understanding of why this library exists
@@ -47,18 +45,18 @@ You are free to implement this however you like.
 
 There are three main goals:
 
-1. knowing how many uses are allowed _per_ token.
-1. knowing how many times each token has been used.
-1. the code should not allow uses above the maximum allowed.
+1. Knowing how many uses are allowed _per_ token.
+2. Knowing how many times each token has been used.
+3. The code should not allow uses above the maximum allowed.
 
 
 ### 👩‍💻 What is this test designed to showcase?
 
-* your ability to set up a Python project.
-* your capacity to take existing code and build on top of it.
-* your solution to this particular problem.
-* how you work as part of a normal code review process.
-* how your pull request explains the change to the team.
+* Your ability to set up a Python project.
+* Your capacity to take existing code and build on top of it.
+* Your solution to this particular problem.
+* How you work as part of a normal code review process.
+* How your pull request explains the change to the team.
 
 ### 📥 Submission procedure
 
@@ -70,20 +68,18 @@ There are three main goals:
 1. Confirm with us that you have done so, stating your GitHub username.
 
 <sup>☨</sup> There are privacy concerns with submitting to a project that is openly
-accessible to the web so please take that into account, and if you require
+accessible to the web, so please take that into account. If you require
 the extra anonymity - please register a throwaway GitHub account instead of
 using your actual GitHub account.
 
 ### 🕰️ What will happen to my code after?
 
 * Your code & PR will be reviewed, and we may ask questions of it come the
-interview as you'd expect as part of a normal code review process.
-
-* We discuss the code in the next stages of the interview pipeline.
+next stages of the interview pipeline, as you'd expect as part of a normal code review
+process.
 
 * After that, we delete the repository. Your code will never be used in
 production.
-
 
 ----
 
