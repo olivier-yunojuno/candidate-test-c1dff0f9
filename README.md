@@ -277,17 +277,33 @@ def complicated_rules(request):
 
 ### Development
 
+#### Quick Start
+
 To set up your local environment:
 
-1. Install Python 3.x ( see `tox.ini` for supported versions)
+1. **Install Python 3.10 or higher**
+   - Supported versions: 3.10, 3.11, 3.12, 3.13 (see `tox.ini`)
+   - Check your version: `python3 --version`
 
-1. Install Poetry (at least version 1.7)
+2. **Install Poetry** (at least version 2.0)
+   ```bash
+   curl -sSL https://install.python-poetry.org | python3 -
+   ```
+   - Check installation: `poetry --version`
 
-1. Install the dependencies & working environment:
+3. **Install dependencies**
+   ```bash
+   poetry install
+   ```
+   This will install Django 5.2 LTS and all development dependencies.
 
-```bash
-poetry install
-```
+4. **Verify everything works**
+   ```bash
+   poetry run pytest
+   poetry run python manage.py check
+   ```
+
+You should see all tests passing with no Django system check errors.
 
 ### Testing
 
@@ -296,7 +312,13 @@ The test suite is handled by pytest & tox.
 Run suite in your environment:
 
 ```bash
-poetry run test
+poetry run pytest
+```
+
+Run suite with coverage:
+
+```bash
+poetry run pytest --cov=visitors
 ```
 
 Run suite & extra checks in all supported environments:

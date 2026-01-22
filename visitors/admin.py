@@ -24,6 +24,7 @@ def pretty_print(data: Optional[dict]) -> str:
 class VisitorsAdmin(admin.ModelAdmin):
     """Admin model for Visitor objects."""
 
+    @admin.action(description="Deactivate selected Visitor passes")
     def deactivate(self, request: HttpRequest, queryset: QuerySet) -> None:
         """Call deactivate on all selected Visitor objects."""
         count = queryset.count()
@@ -33,8 +34,7 @@ class VisitorsAdmin(admin.ModelAdmin):
             request, f"{count} passes have been disabled.", messages.SUCCESS
         )
 
-    deactivate.short_description = "Deactivate selected Visitor passes"  # type: ignore
-
+    @admin.action(description="Reactivate selected Visitor passes")
     def reactivate(self, request: HttpRequest, queryset: QuerySet) -> None:
         """Reactivate all selected Visitor objects."""
         count = queryset.count()
@@ -43,8 +43,6 @@ class VisitorsAdmin(admin.ModelAdmin):
         self.message_user(
             request, f"{count} passes have been activated.", messages.SUCCESS
         )
-
-    reactivate.short_description = "Reactivate selected Visitor passes"  # type: ignore
 
     actions = (deactivate, reactivate)
     list_filter = ("scope",)
@@ -72,15 +70,13 @@ class VisitorsAdmin(admin.ModelAdmin):
         "created_at",
     )
 
+    @admin.display(boolean=True)
     def _is_valid(self, obj: Visitor) -> bool:
         return obj.is_valid
 
-    _is_valid.boolean = True  # type: ignore
-
+    @admin.display(description="Context (prettified)")
     def _context(self, obj: Visitor) -> str:
         return pretty_print(obj.context)
-
-    _context.short_description = "Context (prettified)"  # type: ignore
 
 
 @admin.register(VisitorLog)
