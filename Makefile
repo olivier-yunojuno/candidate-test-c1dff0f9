@@ -15,6 +15,18 @@ install: uv_check
 	${UV} tool run 'poetry==${poetry_version}' install
 	${UV} run pre-commit install
 
+.PHONY: test
+test: pytest_args ?=
+test:
+	${UV} run pytest ${pytest_args}
+
+.PHONY: format
+format: black_args ?=
+format: isort_args ?=
+format:
+	${UV} run black ${black_args} tests/ visitors/
+	${UV} run isort ${isort_args} tests/ visitors/
+
 .PHONY: uv_check
 uv_check:
 	@if ! type ${UV} >/dev/null 2>&1 ; then \

@@ -4,7 +4,7 @@ import uuid
 import pytest
 from django.utils.timezone import now as tz_now
 
-from visitors.models import InvalidVisitorPass, Visitor
+from visitors.models import InvalidVisitorPass, Visitor, VisitorLog
 
 TEST_UUID: str = "68201321-9dd2-4fb3-92b1-24367f38a7d6"
 
@@ -108,3 +108,50 @@ def test_has_expired(expires_at, has_expired):
     visitor = Visitor()
     visitor.expires_at = expires_at
     assert visitor.has_expired == has_expired
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    "visitor_logs_count,uses_count",
+    (
+        # We'll just test a couple of counts, to make sure they're correlated to
+        # the number of VisitorLogs:
+        (0, 0),
+        (1, 1),
+        (10, 10),
+    ),
+)
+def test_uses_count(visitor_logs_count: int, uses_count: int):
+    visitor = Visitor.objects.create()
+    VisitorLog.objects.bulk_create(
+        [VisitorLog(visitor=visitor) for _ in range(visitor_logs_count)],
+    )
+
+    assert visitor.uses_count() == uses_count
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    "maximum_uses,visitor_logs_count,can_still_be_used",
+    (
+        # unlimited uses first:
+        (0, 0, True),
+        (0, 10, True),
+        # limited number of uses:
+        (1, 0, True),
+        (1, 1, False),  # the single use that was allowed was... used
+        (2, 0, True),
+        (2, 1, True),
+        (2, 2, False),
+    ),
+)
+def test_can_still_be_used(
+    maximum_uses: int, visitor_logs_count: int, can_still_be_used: bool
+):
+    visitor = Visitor.objects.create(maximum_uses=maximum_uses)
+
+    VisitorLog.objects.bulk_create(
+        [VisitorLog(visitor=visitor) for _ in range(visitor_logs_count)],
+    )
+
+    assert visitor.can_still_be_used() == can_still_be_used
