@@ -8,7 +8,7 @@ help:
 	@grep -P '^[.a-zA-Z/_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
 
 .PHONY: install
-install: python_version ?= 3.11
+install: python_version ?= 3.10
 install: poetry_version ?= 1.8.5
 install: uv_check
 	${UV} venv --python ${python_version}

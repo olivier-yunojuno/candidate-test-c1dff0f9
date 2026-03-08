@@ -4,21 +4,21 @@ repos:
       rev: v5.7.0
       hooks:
           - id: isort
-            language_version: python3.11
+            language_version: python3.10
 
     # python code formatting - will amend files
     - repo: https://github.com/ambv/black
       rev: 20.8b1
       hooks:
           - id: black
-            language_version: python3.11
+            language_version: python3.10
 
     # Flake8 includes pyflakes, pycodestyle, mccabe, pydocstyle, bandit
     - repo: https://github.com/PyCQA/flake8 # https://gitlab.com/pycqa/flake8
       rev: 3.8.4
       hooks:
           - id: flake8
-            language_version: python3.11
+            language_version: python3.10
             additional_dependencies: ["flake8-docstrings", "flake8-bandit"]
             exclude: ^tests|migrations
 
@@ -27,7 +27,7 @@ repos:
       rev: v1.19.1
       hooks:
           - id: mypy
-            language_version: python3.11
+            language_version: python3.10
             args:
                 - --disallow-untyped-defs
                 - --disallow-incomplete-defs
