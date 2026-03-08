@@ -12,38 +12,38 @@ help:
 
 .PHONY: install
 install: poetry_version ?= 1.8.5
-install: uv_check .venv
+install: uv_check .venv ## Install Python dependencies with Poetry, and install pre-commit
 	${UV} tool run 'poetry==${poetry_version}' install
 	${PYTHON_BINARIES}/pre-commit install
 
 .PHONY: test
-test: pytest_args ?=
+test: pytest_args ?= ## Run the test suite, powered by Pytest
 test:
 	@${PYTHON_BINARIES}/pytest ${pytest_args}
 
 .PHONY: code-quality
-code-quality: fmt lint mypy
+code-quality: fmt lint mypy ## Run all the code quality tools
 
 # Let's reflect the "fmt", "lint" and "mypy" Tox environments
 .PHONY: fmt
 fmt: black_args ?= --target-version py310
 fmt: isort_args ?=
-fmt:
+fmt: ## Run Black and isort
 	@${PYTHON_BINARIES}/black ${black_args} tests/ visitors/
 	@${PYTHON_BINARIES}/isort ${isort_args} tests/ visitors/
 
 .PHONY: lint
 lint: flake8_args ?=
-lint:
+lint: ## Run Flake8
 	@${PYTHON_BINARIES}/flake8 ${flake8_args}
 
 .PHONY: mypy
 mypy: mypy_args ?=
-mypy:
+mypy: ## Run MyPy
 	@${PYTHON_BINARIES}/mypy ${mypy_args} visitors/
 
 .PHONY: uv_check
-uv_check:
+uv_check: # internal target, doesn't need documentation
 	@if ! type ${UV} >/dev/null 2>&1 ; then \
 		echo "⚠️ This Makefile relies on uv, but uv doesn't seem to be installed."; \
  		echo "Please install it following these instructions: https://docs.astral.sh/uv/"; \
@@ -51,5 +51,5 @@ uv_check:
 	fi
 
 .venv: python_version ?= 3.10
-.venv:
+.venv: # internal target, doesn't need documentation
 	${UV} venv --python ${python_version}
