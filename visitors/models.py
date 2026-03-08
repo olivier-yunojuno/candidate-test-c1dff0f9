@@ -54,6 +54,7 @@ class Visitor(models.Model):
     )
     maximum_uses = models.PositiveSmallIntegerField(
         default=UNLIMITED_USES,
+        db_default=UNLIMITED_USES,
         help_text=_lazy(
             "Maximum number of uses. Use zero for unlimited number of uses."
         ),

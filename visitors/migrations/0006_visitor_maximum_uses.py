@@ -15,6 +15,7 @@ class Migration(migrations.Migration):
             name="maximum_uses",
             field=models.PositiveSmallIntegerField(
                 default=0,
+                db_default=0,
                 help_text="Maximum number of uses. Use zero for unlimited number of uses.",
             ),
         ),
