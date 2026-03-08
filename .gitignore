@@ -1,3 +1,6 @@
+# We only use `uv` in the Makefile - let's not version its lockfile:
+/uv.lock
+
 *.pyc
 *.egg-info
 *.bak

@@ -22,6 +22,7 @@ class Visitor(models.Model):
     """A temporary visitor (betwixt anonymous and authenticated)."""
 
     DEFAULT_TOKEN_EXPIRY = datetime.timedelta(seconds=VISITOR_TOKEN_EXPIRY)
+    UNLIMITED_USES = 0
 
     uuid = models.UUIDField(default=uuid.uuid4)
     first_name = models.CharField(max_length=150, blank=True)
@@ -49,6 +50,13 @@ class Visitor(models.Model):
         default=True,
         help_text=_lazy(
             "Set to False to disable the visitor link and prevent further access."
+        ),
+    )
+    maximum_uses = models.PositiveSmallIntegerField(
+        default=UNLIMITED_USES,
+        db_default=UNLIMITED_USES,
+        help_text=_lazy(
+            "Maximum number of uses. Use zero for unlimited number of uses."
         ),
     )
 
@@ -87,15 +95,19 @@ class Visitor(models.Model):
 
     @property
     def is_valid(self) -> bool:
-        """Return True if the token is active and not yet expired."""
-        return self.is_active and not self.has_expired
+        """Return True if the token is active, not yet expired and can stil be used."""
+        return self.is_active and not self.has_expired and self.can_still_be_used()
 
     def validate(self) -> None:
-        """Raise InvalidVisitorPass if inactive or expired."""
+        """Raise InvalidVisitorPass if inactive, expired, or was used too many times."""
         if not self.is_active:
             raise InvalidVisitorPass("Visitor pass is inactive")
         if self.has_expired:
             raise InvalidVisitorPass("Visitor pass has expired")
+        if not self.can_still_be_used():
+            raise InvalidVisitorPass(
+                "Visitor pass has reached its maximum number of uses"
+            )
 
     def serialize(self) -> dict:
         """
@@ -133,6 +145,29 @@ class Visitor(models.Model):
         self.is_active = True
         self.expires_at = tz_now() + self.DEFAULT_TOKEN_EXPIRY
         self.save()
+
+    def uses_count(self) -> int:
+        """
+        Return the number of times a token was used, according to our VisitorLog table.
+
+        ⚠️ Triggers a "COUNT" database query under the hood.
+        """
+        return VisitorLog.objects.filter(visitor=self).count()
+
+    def can_still_be_used(self) -> bool:
+        """
+        Return True if the token's number of uses is still under its allowed maximum.
+
+        The number of uses is determined according to our VisitorLogs.
+
+        ⚠️ If the maximum number of uses has been set, will trigger a "COUNT" database
+        query under the hood.
+        """
+        if self._state.adding:
+            return True
+        if self.maximum_uses == 0:
+            return True  # no need to trigger a database query
+        return self.uses_count() < self.maximum_uses
 
 
 class VisitorLogManager(models.Manager):

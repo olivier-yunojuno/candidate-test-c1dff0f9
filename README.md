@@ -301,6 +301,14 @@ To set up your local environment:
 
 You should see all tests passing with no Django system check errors.
 
+Alternatively, if you have [uv](https://docs.astral.sh/uv/) and
+[Make](https://en.wikipedia.org/wiki/Make_(software)) installed you can just run:
+```bash
+make install
+```
+
+And then run `make help` to see the available commands - `make test`, for example.
+
 ### Testing
 
 The test suite is handled by pytest & tox.
