@@ -1,5 +1,7 @@
 import datetime
 import uuid
+from contextlib import nullcontext
+from unittest import mock
 
 import pytest
 from django.utils.timezone import now as tz_now
@@ -55,39 +57,63 @@ def test_reactivate():
 
 
 @pytest.mark.parametrize(
-    "is_active,expires_at,is_valid",
+    "is_active,expires_at,can_still_be_used,is_valid",
     (
-        (True, TOMORROW, True),
-        (False, TOMORROW, False),
-        (False, YESTERDAY, False),
-        (True, YESTERDAY, False),
+        (True, TOMORROW, True, True),
+        (False, TOMORROW, True, False),
+        (False, YESTERDAY, True, False),
+        (True, YESTERDAY, True, False),
+        (True, TOMORROW, False, False),
     ),
 )
-def test_validate(is_active, expires_at, is_valid):
+def test_validate(
+    is_active: bool,
+    expires_at: datetime.datetime,
+    can_still_be_used: bool,
+    is_valid: bool,
+):
     visitor = Visitor(is_active=is_active, expires_at=expires_at)
     assert visitor.is_active == is_active
     assert visitor.has_expired == bool(expires_at < TODAY)
-    if is_valid:
-        visitor.validate()
-        return
-    with pytest.raises(InvalidVisitorPass):
-        visitor.validate()
+    validation_context = (
+        nullcontext()
+        if can_still_be_used
+        else mock.patch("visitors.models.Visitor.can_still_be_used", return_value=False)
+    )
+    with validation_context:
+        if is_valid:
+            visitor.validate()
+            return
+        with pytest.raises(InvalidVisitorPass):
+            visitor.validate()
 
 
 @pytest.mark.parametrize(
-    "is_active,expires_at,is_valid",
+    "is_active,expires_at,can_still_be_used,is_valid",
     (
-        (True, TOMORROW, True),
-        (False, TOMORROW, False),
-        (False, YESTERDAY, False),
-        (True, YESTERDAY, False),
-        (True, None, True),
-        (False, None, False),
+        (True, TOMORROW, True, True),
+        (False, TOMORROW, True, False),
+        (False, YESTERDAY, True, False),
+        (True, YESTERDAY, True, False),
+        (True, None, True, True),
+        (False, None, True, False),
+        (True, TOMORROW, False, False),
     ),
 )
-def test_is_valid(is_active, expires_at, is_valid):
+def test_is_valid(
+    is_active: bool,
+    expires_at: datetime.datetime,
+    can_still_be_used: bool,
+    is_valid: bool,
+):
     visitor = Visitor(is_active=is_active, expires_at=expires_at)
-    assert visitor.is_valid == is_valid
+    validation_context = (
+        nullcontext()
+        if can_still_be_used
+        else mock.patch("visitors.models.Visitor.can_still_be_used", return_value=False)
+    )
+    with validation_context:
+        assert visitor.is_valid == is_valid
 
 
 def test_defaults():
@@ -126,7 +152,6 @@ def test_uses_count(visitor_logs_count: int, uses_count: int):
     VisitorLog.objects.bulk_create(
         [VisitorLog(visitor=visitor) for _ in range(visitor_logs_count)],
     )
-
     assert visitor.uses_count() == uses_count
 
 
@@ -149,9 +174,7 @@ def test_can_still_be_used(
     maximum_uses: int, visitor_logs_count: int, can_still_be_used: bool
 ):
     visitor = Visitor.objects.create(maximum_uses=maximum_uses)
-
     VisitorLog.objects.bulk_create(
         [VisitorLog(visitor=visitor) for _ in range(visitor_logs_count)],
     )
-
     assert visitor.can_still_be_used() == can_still_be_used
